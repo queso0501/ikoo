@@ -1,72 +1,68 @@
 import OpenAI from "openai";
+import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
-import type { VercelRequest, VercelResponse } from '@vercel/node';
-
 export default async function handler(
   req: VercelRequest,
   res: VercelResponse
 ) {
-  res.status(200).json({ message: "ok" });
-}
-
-  const { content, count = 10 } = req.body as { content: string; count: number };
-
-  if (!content) {
-    res.status(400).json({ error: "content is required" });
-    return;
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
-  const stripped = content.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 6000);
+  const { content, count = 10 } = req.body as {
+    content: string;
+    count: number;
+  };
 
-  const prompt = `Eres un profesor que genera preguntas de opción múltiple para un examen de ingreso universitario en Argentina (estilo UNCUYO/CBC).
+  if (!content) {
+    return res.status(400).json({ error: "content is required" });
+  }
 
-Basándote en el siguiente contenido de estudio, genera exactamente ${count} preguntas de opción múltiple.
+  const stripped = content
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, 6000);
+
+  const prompt = `Eres un profesor que genera preguntas de opción múltiple.
+
+Genera exactamente ${count} preguntas.
 
 CONTENIDO:
 ${stripped}
 
-REGLAS ESTRICTAS:
-- Cada pregunta debe tener exactamente 4 opciones (A, B, C, D)
-- Solo una opción es correcta
-- Las preguntas deben evaluar comprensión, no solo memorización
-- Las preguntas deben ser claras y sin ambigüedad
-- Varía el tipo: definiciones, aplicaciones, comparaciones, cálculos si aplica
-- Responde ÚNICAMENTE con JSON válido, sin texto adicional
-
-Formato de respuesta (JSON):
+Responde SOLO en JSON:
 {
   "questions": [
     {
-      "question": "texto de la pregunta",
-      "options": ["opción A", "opción B", "opción C", "opción D"],
+      "question": "...",
+      "options": ["A","B","C","D"],
       "correct": 0
     }
   ]
-}
-
-El campo "correct" es el índice (0-3) de la respuesta correcta.`;
+}`;
 
   try {
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-mini",
       messages: [{ role: "user", content: prompt }],
-      max_tokens: 4096,
     });
 
     const raw = completion.choices[0]?.message?.content ?? "{}";
+
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
+
     if (!jsonMatch) {
-      res.status(500).json({ error: "Invalid AI response" });
-      return;
+      return res.status(500).json({ error: "Invalid AI response" });
     }
-    const parsed = JSON.parse(jsonMatch[0]);
-    res.status(200).json(parsed);
+
+    return res.status(200).json(JSON.parse(jsonMatch[0]));
   } catch (err) {
-    console.error("Quiz generation error:", err);
-    res.status(500).json({ error: "Failed to generate quiz" });
+    console.error(err);
+    return res.status(500).json({ error: "Failed to generate quiz" });
   }
 }
