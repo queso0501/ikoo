@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --app-font-sans: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--app-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Study content styling */
+.study-content {
+  line-height: 1.7;
+  color: #374151;
+}
+
+.study-content section {
+  max-width: 100%;
+}
+
+.study-content h2 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.study-content h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #334155;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.study-content p {
+  margin-bottom: 0.6rem;
+  text-align: left;
+}
+
+.study-content ul {
+  list-style: none;
+  padding-left: 0;
+  margin-bottom: 0.75rem;
+}
+
+.study-content ul li {
+  position: relative;
+  padding-left: 1.25rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.9rem;
+}
+
+.study-content ul li::before {
+  content: "•";
+  position: absolute;
+  left: 0;
+  color: #38bdf8;
+  font-weight: bold;
+}
+
+.study-content ul ul li::before {
+  content: "◦";
+  color: #94a3b8;
+}
+
+.study-content b, .study-content strong {
+  color: #1e293b;
+}
+
+.study-content div {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.study-content section > p {
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-left: 3px solid #38bdf8;
+  border-radius: 0 0.5rem 0.5rem 0;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.study-content section > h3 {
+  margin-top: 0;
+}
+
+sup, sub {
+  font-size: 0.7em;
+}
